@@ -70,16 +70,6 @@
   }
 }
 
-.sticky {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: white;
-  z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -132,7 +122,11 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  @apply
+  duration-200
+  border
+  border-slate-900
+  border-opacity-50
 }
 button:focus,
 button:focus-visible {
@@ -157,12 +151,12 @@ button:focus-visible {
   flex
   flex-col
   p-5
-  bg-slate-950
+  bg-gray-900
   rounded-lg
   shadow-md
   text-slate-50
   border-2
-  border-slate-900
+  border-gray-900
   border-opacity-50;
 }
 

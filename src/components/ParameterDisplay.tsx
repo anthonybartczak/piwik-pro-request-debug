@@ -10,6 +10,7 @@ type Parameter = {
   example: string | number | string[];
   deprecated?: boolean;
   required?: boolean;
+  apiValue: string;
 };
 
 type Schema = {
@@ -33,7 +34,7 @@ function ParameterDisplay({ parsedQueryString }: { parsedQueryString: ParsedQuer
   const [foundParameters, setFoundParameters] = useState<Parameter[]>([]);
 
   useEffect(() => {
-    console.log("Rendering ParameterDisplay...")
+    console.log("Rendering ParameterDisplay...");
     const compareParameters = () => {
       const apiParameters = docs.paths["/ppms.php"].get.parameters;
       const foundParameters = parsedQueryString.filter((param: { name: string; }) =>
@@ -42,7 +43,8 @@ function ParameterDisplay({ parsedQueryString }: { parsedQueryString: ParsedQuer
         const apiParam = apiParameters.find(apiParam => apiParam.name === param.name);
         return {
           ...param,
-          ...apiParam
+          ...apiParam,
+          apiValue: param.value
         } as Parameter;
       });
 
@@ -51,6 +53,7 @@ function ParameterDisplay({ parsedQueryString }: { parsedQueryString: ParsedQuer
 
     setFoundParameters(compareParameters());
   }, [parsedQueryString]);
+
 
   const removeParameter = (parameterName: string) => {
     setFoundParameters(foundParameters.filter((param: Parameter) => param.name !== parameterName));
@@ -69,10 +72,25 @@ function ParameterDisplay({ parsedQueryString }: { parsedQueryString: ParsedQuer
             <strong>Example:</strong>
             <code>{parameter.example}</code>
           </div>
+          <div className='flex flex-row gap-2'>
+            <strong>Current value:</strong>
+            <code>{parameter.apiValue}</code>
+            <button
+              onClick={() => {
+                const decodedValue = decodeURIComponent(parameter.apiValue);
+                if (decodedValue !== null) {
+                  parameter.apiValue = decodedValue;
+                  setFoundParameters([...foundParameters]);
+                }
+              }}
+              className="text-xs py-0.5 px-1 bg-slate-950 transition duration-300 hover:bg-slate-800">
+              Decode
+            </button>
+          </div>
           <Markdown>{parameter.description}</Markdown>
           <button
             onClick={() => removeParameter(parameter.name)}
-            className="absolute top-0 right-0 m-2 text-xs text-red-500">
+            className="absolute top-0 right-0 m-2 text-xs bg-slate-950 transition duration-300 hover:bg-slate-800">
             ❌
           </button>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import parseQueryString from './utils/parseQueryString';
+import ScrollToTopButton from './components/ScrollToTopButton';
 import ParameterDisplay from './components/ParameterDisplay';
 import { Badge } from "./components/ui/badge"
 
@@ -25,6 +26,7 @@ const App: React.FC = () => {
 
   return (
     <div className='flex flex-col my-10 mx-10 justify-center gap-y-4'>
+      <ScrollToTopButton />
       <form onSubmit={handleSubmit} className='flex flex-row gap-x-2'>
         <input
           type="text"
@@ -39,7 +41,7 @@ const App: React.FC = () => {
       </form>
       <div id="badges-container" className='flex flex-row flex-wrap gap-1 justify-stretch'>
         {parsedQueryString.map((param) => (
-            <Badge key={param.name} className='text-sm rounded-md hover:bg-slate-800'onClick={() => {
+            <Badge key={param.name} className='text-sm rounded-md bg-slate-900 hover:bg-slate-800'onClick={() => {
             const element = document.getElementById(param.name);
             element?.scrollIntoView({
               behavior: 'smooth'
