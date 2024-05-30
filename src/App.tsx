@@ -43,7 +43,7 @@ const App: React.FC = () => {
           placeholder="Enter Piwik PRO query string"
           className="p-3 border border-slate-800 rounded min-w-max w-full"
         />
-        <button type="submit" className="bg-blue-700 text-white rounded">
+        <button type="submit" className="bg-blue-700 text-white rounded px-12">
           Submit
         </button>
       </form>
@@ -63,6 +63,14 @@ const App: React.FC = () => {
           </Badge>
         ))}
       </div>
+      {parsedQueryString.length > 0 && (
+        <div id="modified-query-string" className=''>
+          <h1 className='text-xl my-2'>Modified query string</h1>
+          <textarea className='min-w-max w-full min-h-fit p-3 border border-slate-800 rounded' readOnly
+            value={parsedQueryString.map((param) => `${param.name}=${param.value}`).join('&')}>
+          </textarea>
+        </div>
+      )}
       <div className="flex flex-col gap-y-2">
         <ParameterDisplay parsedQueryString={parsedQueryString} setParsedQueryString={setParsedQueryString} />
       </div>

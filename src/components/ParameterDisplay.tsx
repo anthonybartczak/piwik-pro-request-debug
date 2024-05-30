@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Markdown from 'react-markdown';
 import docs from '../utils/docs.json';
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from "../components/ui/drawer"
+
+import { Button } from "../components/ui/button"
 
 type Schema = {
   type: string;
@@ -37,6 +47,8 @@ interface ParameterDisplayProps {
 
 const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, setParsedQueryString }) => {
   const [foundParameters, setFoundParameters] = useState<Parameter[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerContent, setDrawerContent] = useState({ title: "", description: "" });
 
   useEffect(() => {
     console.log("Rendering ParameterDisplay...");
@@ -64,6 +76,15 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
     setParsedQueryString(parsedQueryString.filter((param) => param.name !== parameterName));
   };
 
+  const updateDrawerContent = () => {
+    drawerOpen ? setDrawerOpen(false) : setDrawerOpen(true);
+    const content: { title: string, description: string } = {
+      title: "Parameter details",
+      description: "This drawer contains details about the parameter.",
+    }
+    setDrawerContent(content);
+  }
+
   return (
     <>
       {foundParameters.length > 0 && (
@@ -81,7 +102,7 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
               <div className="flex flex-row gap-2">
                 <strong>Current value:</strong>
                 <code>{parameter.apiValue}</code>
-                <button
+                <Button
                   onClick={() => {
                     const decodedValue = decodeURIComponent(parameter.apiValue);
                     if (decodedValue !== null) {
@@ -89,22 +110,43 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
                       setFoundParameters([...foundParameters]);
                     }
                   }}
-                  className="text-xs py-0.5 px-1 bg-slate-950 transition duration-300 hover:bg-slate-800"
+                  className="text-xs py-0.5 px-1 h-auto bg-slate-950 transition duration-300 hover:bg-slate-800"
                 >
                   Decode
-                </button>
+                </Button>
               </div>
               <Markdown>{parameter.description}</Markdown>
-              <button
-                onClick={() => removeParameter(parameter.name)}
-                className="absolute top-0 right-0 m-2 text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
-              >
-                ❌
-              </button>
+              <div className='absolute flex flex-col top-0 right-0 m-2 gap-y-2'>
+                <Button
+                  onClick={() => removeParameter(parameter.name)}
+                  className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
+                >
+                  ❌
+                </Button>
+                <Button
+                  onClick={() => updateDrawerContent()}
+                  className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
+                >
+                  🔍
+                </Button>
+              </div>
             </div>
           ))}
         </>
       )}
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} shouldScaleBackground={false}>
+        <DrawerContent className="bg-slate-800 border-slate-800 p-2 m-20">
+          <DrawerHeader>
+            <DrawerTitle>{drawerContent?.title}</DrawerTitle>
+            <DrawerDescription>This action cannot be undone.</DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter>
+            <Button className='absolute top-0 right-0 p-2 m-2' onClick={() => setDrawerOpen(false)}>
+              Close
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };
