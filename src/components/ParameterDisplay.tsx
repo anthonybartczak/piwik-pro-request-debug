@@ -81,6 +81,13 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
     setFoundParameters(compareParameters());
   }, [parsedQueryString]);
 
+  const truncateString = (str: string, length: number, ending = '...') => {
+    if (str.length > length) {
+      return str.slice(0, length - ending.length) + ending;
+    }
+    return str;
+  };
+
   const removeParameter = (parameterName: string) => {
     setFoundParameters(foundParameters.filter((param) => param.name !== parameterName));
     setParsedQueryString(parsedQueryString.filter((param) => param.name !== parameterName));
@@ -103,11 +110,11 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
               </div>
               <div className="flex flex-row gap-2">
                 <strong>Example:</strong>
-                <code>{parameter.example}</code>
+                <code>{truncateString(parameter.example.toString(), 128)}</code>
               </div>
               <div className="flex flex-row gap-2">
                 <strong>Current value:</strong>
-                <code>{parameter.apiValue}</code>
+                <code>{truncateString(parameter.apiValue.toString(), 128)}</code>
                 <Button
                   onClick={() => {
                     const decodedValue = decodeURIComponent(parameter.apiValue);
