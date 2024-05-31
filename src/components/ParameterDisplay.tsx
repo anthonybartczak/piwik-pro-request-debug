@@ -33,6 +33,7 @@ type Parameter = {
   deprecated?: boolean;
   required?: boolean;
   apiValue: string;
+  originalParameterName: string;
 };
 
 type ParsedQueryString = {
@@ -48,22 +49,31 @@ interface ParameterDisplayProps {
 const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, setParsedQueryString }) => {
   const [foundParameters, setFoundParameters] = useState<Parameter[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerContent, setDrawerContent] = useState({ title: "", description: "" });
+  const [drawerContent, setDrawerContent] = useState<Parameter | null>(null);
 
   useEffect(() => {
-    console.log("Rendering ParameterDisplay...");
     const compareParameters = () => {
       const apiParameters = docs.paths["/ppms.php"].get.parameters;
-      const foundParameters = parsedQueryString.filter((param: { name: string; }) =>
-        apiParameters.some(apiParam => apiParam.name === param.name)
-      ).map((param: { name: string; value: string; }) => {
-        const apiParam = apiParameters.find(apiParam => apiParam.name === param.name);
-        return {
-          ...param,
-          ...apiParam,
-          apiValue: param.value
-        } as Parameter;
-      });
+      const foundParameters = parsedQueryString.map((param: { name: string; value: string; }) => {
+        let paramName = param.name;
+
+        if (paramName.startsWith("dimension")) {
+          paramName = "dimensionID";
+        }
+
+        const apiParam = apiParameters.find(apiParam => apiParam.name === paramName);
+
+        if (apiParam) {
+          return {
+            ...param,
+            ...apiParam,
+            apiValue: param.value,
+            originalParameterName: param.name,
+          } as Parameter;
+        }
+
+        return null;
+      }).filter((param): param is Parameter => param !== null);
 
       return foundParameters;
     };
@@ -76,21 +86,17 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
     setParsedQueryString(parsedQueryString.filter((param) => param.name !== parameterName));
   };
 
-  const updateDrawerContent = () => {
-    drawerOpen ? setDrawerOpen(false) : setDrawerOpen(true);
-    const content: { title: string, description: string } = {
-      title: "Parameter details",
-      description: "This drawer contains details about the parameter.",
-    }
-    setDrawerContent(content);
-  }
+  const updateDrawerContent = (parameter: Parameter) => {
+    setDrawerOpen(true);
+    setDrawerContent(parameter);
+  };
 
   return (
     <>
       {foundParameters.length > 0 && (
         <>
           {foundParameters.map((parameter) => (
-            <div id={parameter.name} className="relative min-w-full border rounded-md parameter-block gap-y-1.5" key={parameter.name}>
+            <div id={parameter.originalParameterName} className="relative min-w-full border rounded-md parameter-block gap-y-1.5" key={parameter.name}>
               <div className="flex flex-row gap-2">
                 <strong>Parameter:</strong>
                 <code>{parameter.name}</code>
@@ -118,13 +124,13 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
               <Markdown>{parameter.description}</Markdown>
               <div className='absolute flex flex-col top-0 right-0 m-2 gap-y-2'>
                 <Button
-                  onClick={() => removeParameter(parameter.name)}
+                  onClick={() => removeParameter(parameter.originalParameterName)}
                   className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
                 >
                   ❌
                 </Button>
                 <Button
-                  onClick={() => updateDrawerContent()}
+                  onClick={() => updateDrawerContent(parameter)}
                   className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
                 >
                   🔍
@@ -137,9 +143,30 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} shouldScaleBackground={false}>
         <DrawerContent className="bg-slate-800 border-slate-800 p-2 m-20">
           <DrawerHeader>
-            <DrawerTitle>{drawerContent?.title}</DrawerTitle>
-            <DrawerDescription>This action cannot be undone.</DrawerDescription>
+            <DrawerTitle>Parameter name: {drawerContent?.name}</DrawerTitle>
+            <DrawerDescription>
+            </DrawerDescription>
           </DrawerHeader>
+          <Markdown className="text-gray-300 ml-4 mt-2 mb-8">{drawerContent?.description}</Markdown>
+          <div className='ml-4'>
+            {drawerContent && (
+              <>
+                <div className="mb-2">
+                  <strong>Schema:</strong>
+                  <pre>{JSON.stringify(drawerContent.schema, null, 2)}</pre>
+                </div>
+                <div className="mb-2">
+                  <strong>Example: </strong>
+                  <code>{drawerContent.example}</code>
+                </div>
+                {drawerContent.deprecated && (
+                  <div className="mb-2">
+                    <strong>Deprecated:</strong> Yes
+                  </div>
+                )}
+              </>
+            )}
+          </div>
           <DrawerFooter>
             <Button className='absolute top-0 right-0 p-2 m-2' onClick={() => setDrawerOpen(false)}>
               Close
