@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import parseQueryString from "./utils/parseQueryString";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import ParameterDisplay from "./components/ParameterDisplay";
@@ -30,16 +30,13 @@ const App: React.FC = () => {
 
   const [savedQueryString, setSavedQueryString] = useLocalStorage(
     "queryString",
-    defaultString,
+    "",
   );
   const [settings, setSettings] = useLocalStorage("settings", {
     useSavedString: true,
   });
 
   const [input, setInput] = useState<string>(defaultString);
-  const [useSavedString, setUseSavedString] = useState<boolean>(
-    settings.useSavedString,
-  );
   const [parsedQueryString, setParsedQueryString] = useState<
     ParsedQueryString[]
   >([]);
@@ -49,11 +46,12 @@ const App: React.FC = () => {
   };
 
   const handleQuerySaveSwitch = () => {
-    const value = !useSavedString;
+    const value = !settings.useSavedString;
 
-    useSavedString ? setSavedQueryString("") : setSavedQueryString(input);
+    settings.useSavedString
+      ? setSavedQueryString("")
+      : setSavedQueryString(input);
 
-    setUseSavedString(value);
     setSettings({ ...settings, useSavedString: value });
   };
 
@@ -69,13 +67,11 @@ const App: React.FC = () => {
     setParsedQueryString(convertedParams);
   };
 
-  if (input !== "" && savedQueryString === "" && useSavedString) {
-    setSavedQueryString(input);
-  }
-
-  if (input === "" && savedQueryString !== "" && useSavedString) {
-    setInput(savedQueryString);
-  }
+  useEffect(() => {
+    if (input === "" && savedQueryString !== "" && settings.useSavedString) {
+      setInput(savedQueryString);
+    }
+  }, [input, savedQueryString, settings.useSavedString]);
 
   return (
     <div className="mt-10 flex min-w-full flex-col justify-center gap-y-2 px-8">
@@ -149,7 +145,7 @@ const App: React.FC = () => {
         <input
           type="text"
           required={true}
-          value={input}
+          defaultValue={input}
           onChange={handleInputChange}
           placeholder="Enter the Piwik PRO request query string"
           className="w-full min-w-max rounded border border-slate-700/[.65] p-3 font-mono"
@@ -210,7 +206,7 @@ const App: React.FC = () => {
       )}
       <div className="flex flex-col gap-y-2">
         <ParameterDisplay
-          useSavedString={useSavedString}
+          useSavedString={settings.useSavedString}
           setSavedQueryString={setSavedQueryString}
           savedQueryString={savedQueryString}
           parsedQueryString={parsedQueryString}

@@ -63,8 +63,7 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({
   const [drawerContent, setDrawerContent] = useState<Parameter | null>(null);
 
   useEffect(() => {
-    if (useSavedString) {
-      console.log("modified");
+    if (useSavedString && parsedQueryString.length > 0) {
       const queryString = parsedQueryString
         .map((param) => `${param.name}=${param.value}`)
         .join("&");
