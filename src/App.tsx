@@ -4,6 +4,8 @@ import ScrollToTopButton from './components/ScrollToTopButton';
 import ParameterDisplay from './components/ParameterDisplay';
 import { Badge } from './components/ui/badge';
 import { Button } from "./components/ui/button"
+import { Copy } from 'lucide-react';
+
 
 type ParsedQueryString = {
   name: string;
@@ -44,7 +46,7 @@ const App: React.FC = () => {
           placeholder="Enter Piwik PRO query string"
           className="p-3 border border-slate-800 rounded min-w-max w-full"
         />
-        <button type="submit" className="bg-blue-700 text-white rounded px-12">
+        <button type="submit" className="bg-gray-900 text-white rounded px-12">
           Submit
         </button>
       </form>
@@ -52,7 +54,7 @@ const App: React.FC = () => {
         {parsedQueryString.map((param) => (
           <Badge
             key={param.name}
-            className="cursor-pointer text-sm rounded-md bg-slate-900 hover:bg-slate-800"
+            className="text-slate-300 font-mono cursor-pointer text-sm rounded-sm bg-slate-900 hover:bg-slate-950"
             onClick={() => {
               const element = document.getElementById(param.name);
               element?.scrollIntoView({
@@ -60,22 +62,22 @@ const App: React.FC = () => {
               });
             }}
           >
-            {param.name}={decodeURIComponent(param.value)}
+            {param.name}
           </Badge>
         ))}
       </div>
       {parsedQueryString.length > 0 && (
-        <div id="modified-query-string" className=''>
-          <div className='flex flex-row gap-x-2'>
-            <h1 className='text-xl my-2'>Modified query string</h1>
-            <Button className='p-2 text-sm h-auto' onClick={() => {
+        <div id="modified-query-string" className='flex flex-col gap-y-2'>
+          <div className='flex flex-row gap-x-2 bg-slate-900 w-fit rounded-md px-2.5 py-1 items-center'>
+            <h1 className='text-sm font-mono text-gray-300'>Query string output</h1>
+            <Button className='p-5 text-sm bg-slate-950 border-none hover:bg-slate-800' onClick={() => {
               const element = document.getElementById("modified-query-string-output") as HTMLInputElement;
               if (element) {
                 navigator.clipboard.writeText(element.value);
               }
-            }}>Copy</Button>
+            }}><Copy className='h-4 w-4'/></Button>
           </div>
-          <textarea id="modified-query-string-output" className='min-w-max w-full min-h-fit p-3 border border-slate-800 rounded' readOnly
+          <textarea id="modified-query-string-output" className='resize-none hover:resize-y font-mono scrollbar-thin min-w-max w-full min-h-fit p-3 border border-slate-800 shadow-md rounded-sm' readOnly
             value={parsedQueryString.map((param) => `${param.name}=${param.value}`).join('&')}>
           </textarea>
         </div>

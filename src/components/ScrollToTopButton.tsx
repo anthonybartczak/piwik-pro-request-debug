@@ -30,10 +30,10 @@ const ScrollToTopButton: React.FC = () => {
     <button
       type="button"
       onClick={scrollToTop}
-      className={`z-40 fixed bottom-4 right-4 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+      className={`z-40 fixed bottom-4 left-4 p-3 rounded-full shadow-xl bg-white hover:bg-neutral-300 focus:ring-2focus:ring-opacity-50 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       aria-label="Scroll to top"
     >
-      <ChevronUp/>
+      <ChevronUp className='text-black'/>
     </button>
   );
 };

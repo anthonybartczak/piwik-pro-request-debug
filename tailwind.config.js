@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 /*eslint-env node*/
 module.exports = {
-  darkMode: ["class"],
+  darkMode: "false",
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -74,5 +74,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require('tailwind-scrollbar')],
 }

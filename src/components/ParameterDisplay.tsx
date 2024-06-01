@@ -10,6 +10,7 @@ import {
   DrawerTitle,
 } from "../components/ui/drawer"
 
+import { Search, Trash } from 'lucide-react';
 import { Button } from "../components/ui/button"
 
 type Schema = {
@@ -103,18 +104,18 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
       {foundParameters.length > 0 && (
         <>
           {foundParameters.map((parameter) => (
-            <div id={parameter.originalParameterName} className="relative min-w-full border rounded-md parameter-block gap-y-1.5" key={parameter.name}>
+            <div id={parameter.originalParameterName} className="relative min-w-full border parameter-block gap-y-1.5" key={parameter.name}>
               <div className="flex flex-row gap-2">
                 <strong>Parameter:</strong>
                 <code>{parameter.name}</code>
               </div>
               <div className="flex flex-row gap-2">
                 <strong>Example:</strong>
-                <code>{truncateString(parameter.example.toString(), 128)}</code>
+                <code>{truncateString(parameter.example.toString(), 96)}</code>
               </div>
               <div className="flex flex-row gap-2">
                 <strong>Current value:</strong>
-                <code>{truncateString(parameter.apiValue.toString(), 128)}</code>
+                <code>{truncateString(parameter.apiValue.toString(), 96)}</code>
                 <Button
                   onClick={() => {
                     const decodedValue = decodeURIComponent(parameter.apiValue);
@@ -134,13 +135,13 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
                   onClick={() => removeParameter(parameter.originalParameterName)}
                   className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
                 >
-                  ❌
+                  <Trash className='h-4 w-4' />
                 </Button>
                 <Button
                   onClick={() => updateDrawerContent(parameter)}
                   className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
                 >
-                  🔍
+                  <Search className='h-4 w-4'/>
                 </Button>
               </div>
             </div>
