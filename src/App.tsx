@@ -6,6 +6,7 @@ import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
 import { Separator } from "./components/ui/separator";
 import { Switch } from "./components/ui/switch";
+import { useLocalStorage } from "usehooks-ts";
 
 import {
   Copy,
@@ -25,15 +26,35 @@ const App: React.FC = () => {
   const defaultString =
     import.meta.env.VITE_IS_DEV === "true"
       ? import.meta.env.VITE_DUMMY_QUERY_STRING
-      : "action_name=hey%20there!";
+      : "";
+
+  const [savedQueryString, setSavedQueryString] = useLocalStorage(
+    "queryString",
+    defaultString,
+  );
+  const [settings, setSettings] = useLocalStorage("settings", {
+    useSavedString: true,
+  });
 
   const [input, setInput] = useState<string>(defaultString);
+  const [useSavedString, setUseSavedString] = useState<boolean>(
+    settings.useSavedString,
+  );
   const [parsedQueryString, setParsedQueryString] = useState<
     ParsedQueryString[]
   >([]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInput(event.target.value);
+  };
+
+  const handleQuerySaveSwitch = () => {
+    const value = !useSavedString;
+
+    useSavedString ? setSavedQueryString("") : setSavedQueryString(input);
+
+    setUseSavedString(value);
+    setSettings({ ...settings, useSavedString: value });
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -47,6 +68,14 @@ const App: React.FC = () => {
 
     setParsedQueryString(convertedParams);
   };
+
+  if (input !== "" && savedQueryString === "" && useSavedString) {
+    setSavedQueryString(input);
+  }
+
+  if (input === "" && savedQueryString !== "" && useSavedString) {
+    setInput(savedQueryString);
+  }
 
   return (
     <div className="mt-10 flex min-w-full flex-col justify-center gap-y-2 px-8">
@@ -98,7 +127,11 @@ const App: React.FC = () => {
           </div>
           <Separator decorative className="bg-gray-800" />
           <div className="flex flex-row">
-            <Switch defaultChecked className="" />
+            <Switch
+              onCheckedChange={handleQuerySaveSwitch}
+              checked={settings.useSavedString}
+              className=""
+            />
             <span className="ml-2 font-thin">Save the query string</span>
           </div>
           <div className="flex flex-row">
@@ -115,9 +148,10 @@ const App: React.FC = () => {
       >
         <input
           type="text"
+          required={true}
           value={input}
           onChange={handleInputChange}
-          placeholder="Enter Piwik PRO query string"
+          placeholder="Enter the Piwik PRO request query string"
           className="w-full min-w-max rounded border border-slate-700/[.65] p-3 font-mono"
         />
         <button
@@ -176,6 +210,9 @@ const App: React.FC = () => {
       )}
       <div className="flex flex-col gap-y-2">
         <ParameterDisplay
+          useSavedString={useSavedString}
+          setSavedQueryString={setSavedQueryString}
+          savedQueryString={savedQueryString}
           parsedQueryString={parsedQueryString}
           setParsedQueryString={setParsedQueryString}
         />

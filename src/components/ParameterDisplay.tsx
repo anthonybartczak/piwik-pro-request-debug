@@ -47,17 +47,30 @@ interface ParameterDisplayProps {
   setParsedQueryString: React.Dispatch<
     React.SetStateAction<ParsedQueryString[]>
   >;
+  setSavedQueryString: React.Dispatch<React.SetStateAction<string>>;
+  useSavedString: boolean;
+  savedQueryString: string;
 }
 
 const ParameterDisplay: React.FC<ParameterDisplayProps> = ({
   parsedQueryString,
   setParsedQueryString,
+  setSavedQueryString,
+  useSavedString,
 }) => {
   const [foundParameters, setFoundParameters] = useState<Parameter[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerContent, setDrawerContent] = useState<Parameter | null>(null);
 
   useEffect(() => {
+    if (useSavedString) {
+      console.log("modified");
+      const queryString = parsedQueryString
+        .map((param) => `${param.name}=${param.value}`)
+        .join("&");
+      setSavedQueryString(queryString);
+    }
+
     const compareParameters = () => {
       const apiParameters = docs.paths["/ppms.php"].get.parameters;
       const foundParameters = parsedQueryString
@@ -89,7 +102,7 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({
     };
 
     setFoundParameters(compareParameters());
-  }, [parsedQueryString]);
+  }, [parsedQueryString, setSavedQueryString, useSavedString]);
 
   const truncateString = (str: string, length: number, ending = "...") => {
     if (str.length > length) {
