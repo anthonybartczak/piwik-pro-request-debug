@@ -4,7 +4,17 @@ import ScrollToTopButton from "./components/ScrollToTopButton";
 import ParameterDisplay from "./components/ParameterDisplay";
 import { Badge } from "./components/ui/badge";
 import { Button } from "./components/ui/button";
-import { Copy } from "lucide-react";
+import { Separator } from "./components/ui/separator";
+import { Switch } from "./components/ui/switch";
+
+import {
+  Copy,
+  Github,
+  Info,
+  Settings2,
+  Linkedin,
+  CircleUser,
+} from "lucide-react";
 
 type ParsedQueryString = {
   name: string;
@@ -39,8 +49,66 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="mx-10 my-10 flex min-w-full flex-col justify-center gap-y-4 px-8">
+    <div className="mt-10 flex min-w-full flex-col justify-center gap-y-2 px-8">
       <ScrollToTopButton />
+      {parsedQueryString.length === 0 && (
+        <div className="flex flex-row gap-x-2">
+          <div className="flex w-3/4 flex-col gap-y-2 text-wrap rounded-sm border border-slate-700/[.65] bg-slate-900 p-4 shadow-md">
+            <div className="flex flex-row items-center gap-x-1">
+              <Info className="h-5 w-5" />
+              <span>What is this?</span>
+            </div>
+            <Separator decorative className="bg-gray-800" />
+            <p className="font-thin">
+              Request Debugger is a simple web application designed to assist
+              users in debugging and troubleshooting requests made to the Piwik
+              PRO HTTP Tracking API. It provides a user-friendly interface that
+              allows to easily analyze and visualize the details of API
+              requests.
+            </p>
+          </div>
+          <div className="flex w-1/4 flex-col gap-y-2 rounded-sm border border-slate-700/[.65] bg-slate-900 p-4 shadow-md">
+            <div className="flex flex-row items-center gap-x-1">
+              <CircleUser className="h-5 w-5" />
+              <span>Contact me</span>
+            </div>
+            <Separator decorative className="bg-gray-800" />
+            <ul className="flex flex-col gap-y-2">
+              <li className="flex gap-x-2">
+                <Github className="h-5 w-5" />
+                <a href="https://github.com/anthonybartczak/piwik-pro-request-debug">
+                  Github
+                </a>
+              </li>
+              <li className="flex gap-x-2">
+                <Linkedin className="h-5 w-5" />
+                <a href="https://www.linkedin.com/in/antoni-bartczak-525187183/">
+                  LinkedIn
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+      <div>
+        <div className="flex flex-col gap-y-2 rounded-sm border border-slate-700/[.65] bg-slate-900 p-4 shadow-md">
+          <div className="flex flex-row items-center gap-x-1">
+            <Settings2 className="h-5 w-5" />
+            <span>Settings</span>
+          </div>
+          <Separator decorative className="bg-gray-800" />
+          <div className="flex flex-row">
+            <Switch defaultChecked className="" />
+            <span className="ml-2 font-thin">Save the query string</span>
+          </div>
+          <div className="flex flex-row">
+            <Switch disabled checked={false} className="" />
+            <span className="ml-2 font-thin">
+              Validate parameter values (WIP)
+            </span>
+          </div>
+        </div>
+      </div>
       <form
         onSubmit={handleSubmit}
         className="flex min-w-full flex-row justify-center gap-x-2"
@@ -50,11 +118,11 @@ const App: React.FC = () => {
           value={input}
           onChange={handleInputChange}
           placeholder="Enter Piwik PRO query string"
-          className="w-full min-w-max rounded border border-slate-800 p-3"
+          className="w-full min-w-max rounded border border-slate-700/[.65] p-3 font-mono"
         />
         <button
           type="submit"
-          className="rounded-sm bg-gray-900 px-12 text-white shadow-md transition duration-300 hover:bg-slate-600"
+          className="rounded-sm border border-slate-700/[.65] bg-gray-900 px-12 text-white shadow-md transition duration-300 hover:bg-slate-600"
         >
           Submit
         </button>
@@ -66,7 +134,7 @@ const App: React.FC = () => {
         {parsedQueryString.map((param) => (
           <Badge
             key={param.name}
-            className="cursor-pointer rounded-sm bg-slate-900 font-mono text-sm text-slate-300 hover:bg-slate-950"
+            className="cursor-pointer rounded-sm border border-slate-700/[.65] bg-slate-900 font-mono text-sm text-slate-300 hover:bg-slate-950"
             onClick={() => {
               const element = document.getElementById(param.name);
               element?.scrollIntoView({
@@ -80,12 +148,10 @@ const App: React.FC = () => {
       </div>
       {parsedQueryString.length > 0 && (
         <div id="modified-query-string" className="flex flex-col gap-y-2">
-          <div className="flex w-fit flex-row items-center gap-x-2 rounded-md bg-slate-900 px-2.5 py-1">
-            <h1 className="font-mono text-sm text-gray-300">
-              Query string output
-            </h1>
+          <div className="flex w-fit flex-row items-center gap-x-2 rounded-sm border border-slate-700/[.65] bg-slate-900 py-1 pl-4 pr-2">
+            <h1 className="text-sm text-gray-300">Query string output</h1>
             <Button
-              className="border-none bg-slate-950 p-5 text-sm hover:bg-slate-800"
+              className="bg-slate-950 p-5 hover:bg-slate-800"
               onClick={() => {
                 const element = document.getElementById(
                   "modified-query-string-output",
@@ -100,7 +166,7 @@ const App: React.FC = () => {
           </div>
           <textarea
             id="modified-query-string-output"
-            className="min-h-fit w-full min-w-max resize-none rounded-sm border border-slate-800 p-3 font-mono shadow-md scrollbar-thin hover:resize-y"
+            className="min-h-fit w-full min-w-max resize-none rounded-sm border border-slate-700/[.65] p-3 font-mono shadow-md scrollbar-thin hover:resize-y"
             readOnly
             value={parsedQueryString
               .map((param) => `${param.name}=${param.value}`)
