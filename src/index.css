@@ -83,7 +83,6 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
 }
 
 a {
@@ -102,8 +101,7 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  @apply
-  justify-center
+  @apply justify-center;
 }
 
 h1 {
@@ -112,7 +110,6 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
   border: 1px solid transparent;
   font-size: 1em;
   font-weight: 500;
@@ -120,13 +117,10 @@ button {
   background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+  @apply rounded-sm;
 }
 button:hover {
-  @apply
-  duration-200
-  border
-  border-slate-900
-  border-opacity-50
+  @apply border border-slate-900 border-opacity-50 duration-200;
 }
 button:focus,
 button:focus-visible {
@@ -146,26 +140,17 @@ button:focus-visible {
   }
 }
 
-input, textarea {
+input,
+textarea {
   @apply bg-gray-950;
 }
 
 .parameter-block {
-  @apply
-  flex
-  flex-col
-  p-5
-  bg-gray-900
-  rounded-sm
-  shadow-md
-  text-slate-200
-  border-2
-  border-gray-900
-  border-opacity-50;
+  @apply flex flex-col rounded-sm border-2 border-gray-900 border-opacity-50 bg-gray-900 p-5 text-slate-200 shadow-md;
 }
 
 code {
-  font-family: 'Fira Code', monospace;
+  font-family: "Fira Code", monospace;
   font-size: 0.9em;
   background-color: #444444;
   padding: 0.1em 0.3em;
@@ -173,25 +158,9 @@ code {
 }
 
 input {
-  @apply
-  bg-gray-950
-  border-2
-  border-gray-900
-  border-opacity-50
-  rounded-lg
-  p-2
-  text-slate-300
-  shadow-md
+  @apply rounded-lg border-2 border-gray-900 border-opacity-50 bg-gray-950 p-2 text-slate-300 shadow-md;
 }
 
 textarea {
-  @apply
-  bg-gray-950
-  border-2
-  border-gray-900
-  border-opacity-50
-  rounded-lg
-  p-2
-  text-slate-300
-  shadow-md
+  @apply rounded-lg border-2 border-gray-900 border-opacity-50 bg-gray-950 p-2 text-slate-300 shadow-md;
 }

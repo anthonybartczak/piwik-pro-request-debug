@@ -1,5 +1,5 @@
-import { ChevronUp } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { ChevronUp } from "lucide-react";
+import React, { useState, useEffect } from "react";
 
 const ScrollToTopButton: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -15,14 +15,14 @@ const ScrollToTopButton: React.FC = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: "smooth",
     });
   };
 
   useEffect(() => {
-    window.addEventListener('scroll', toggleVisibility);
+    window.addEventListener("scroll", toggleVisibility);
     return () => {
-      window.removeEventListener('scroll', toggleVisibility);
+      window.removeEventListener("scroll", toggleVisibility);
     };
   }, []);
 
@@ -30,10 +30,10 @@ const ScrollToTopButton: React.FC = () => {
     <button
       type="button"
       onClick={scrollToTop}
-      className={`z-40 fixed bottom-4 left-4 p-3 rounded-full shadow-xl bg-white hover:bg-neutral-300 focus:ring-2focus:ring-opacity-50 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+      className={`focus:ring-2focus:ring-opacity-50 fixed bottom-4 left-4 z-40 rounded-full bg-white p-3 shadow-xl transition-opacity duration-300 hover:bg-neutral-300 ${isVisible ? "opacity-100" : "opacity-0"}`}
       aria-label="Scroll to top"
     >
-      <ChevronUp className='text-black'/>
+      <ChevronUp className="text-black" />
     </button>
   );
 };

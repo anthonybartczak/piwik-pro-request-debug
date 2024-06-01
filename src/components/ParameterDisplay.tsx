@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import Markdown from 'react-markdown';
-import docs from '../utils/docs.json';
+import React, { useState, useEffect } from "react";
+import Markdown from "react-markdown";
+import docs from "../utils/docs.json";
 import {
   Drawer,
   DrawerContent,
@@ -8,10 +8,10 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-} from "../components/ui/drawer"
+} from "../components/ui/drawer";
 
-import { Search, Trash } from 'lucide-react';
-import { Button } from "../components/ui/button"
+import { Search, Trash, X } from "lucide-react";
+import { Button } from "../components/ui/button";
 
 type Schema = {
   type: string;
@@ -44,10 +44,15 @@ type ParsedQueryString = {
 
 interface ParameterDisplayProps {
   parsedQueryString: ParsedQueryString[];
-  setParsedQueryString: React.Dispatch<React.SetStateAction<ParsedQueryString[]>>;
+  setParsedQueryString: React.Dispatch<
+    React.SetStateAction<ParsedQueryString[]>
+  >;
 }
 
-const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, setParsedQueryString }) => {
+const ParameterDisplay: React.FC<ParameterDisplayProps> = ({
+  parsedQueryString,
+  setParsedQueryString,
+}) => {
   const [foundParameters, setFoundParameters] = useState<Parameter[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerContent, setDrawerContent] = useState<Parameter | null>(null);
@@ -55,26 +60,30 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
   useEffect(() => {
     const compareParameters = () => {
       const apiParameters = docs.paths["/ppms.php"].get.parameters;
-      const foundParameters = parsedQueryString.map((param: { name: string; value: string; }) => {
-        let paramName = param.name;
+      const foundParameters = parsedQueryString
+        .map((param: { name: string; value: string }) => {
+          let paramName = param.name;
 
-        if (paramName.startsWith("dimension")) {
-          paramName = "dimensionID";
-        }
+          if (paramName.startsWith("dimension")) {
+            paramName = "dimensionID";
+          }
 
-        const apiParam = apiParameters.find(apiParam => apiParam.name === paramName);
+          const apiParam = apiParameters.find(
+            (apiParam) => apiParam.name === paramName,
+          );
 
-        if (apiParam) {
-          return {
-            ...param,
-            ...apiParam,
-            apiValue: param.value,
-            originalParameterName: param.name,
-          } as Parameter;
-        }
+          if (apiParam) {
+            return {
+              ...param,
+              ...apiParam,
+              apiValue: param.value,
+              originalParameterName: param.name,
+            } as Parameter;
+          }
 
-        return null;
-      }).filter((param): param is Parameter => param !== null);
+          return null;
+        })
+        .filter((param): param is Parameter => param !== null);
 
       return foundParameters;
     };
@@ -82,7 +91,7 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
     setFoundParameters(compareParameters());
   }, [parsedQueryString]);
 
-  const truncateString = (str: string, length: number, ending = '...') => {
+  const truncateString = (str: string, length: number, ending = "...") => {
     if (str.length > length) {
       return str.slice(0, length - ending.length) + ending;
     }
@@ -90,8 +99,12 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
   };
 
   const removeParameter = (parameterName: string) => {
-    setFoundParameters(foundParameters.filter((param) => param.name !== parameterName));
-    setParsedQueryString(parsedQueryString.filter((param) => param.name !== parameterName));
+    setFoundParameters(
+      foundParameters.filter((param) => param.name !== parameterName),
+    );
+    setParsedQueryString(
+      parsedQueryString.filter((param) => param.name !== parameterName),
+    );
   };
 
   const updateDrawerContent = (parameter: Parameter) => {
@@ -104,7 +117,11 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
       {foundParameters.length > 0 && (
         <>
           {foundParameters.map((parameter) => (
-            <div id={parameter.originalParameterName} className="relative min-w-full border parameter-block gap-y-1.5" key={parameter.name}>
+            <div
+              id={parameter.originalParameterName}
+              className="parameter-block relative min-w-full gap-y-1.5 border"
+              key={parameter.name}
+            >
               <div className="flex flex-row gap-2">
                 <strong>Parameter:</strong>
                 <code>{parameter.name}</code>
@@ -124,39 +141,48 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
                       setFoundParameters([...foundParameters]);
                     }
                   }}
-                  className="text-xs py-0.5 px-1 h-auto bg-slate-950 transition duration-300 hover:bg-slate-800"
+                  className="h-auto bg-slate-950 px-1 py-0.5 text-xs transition duration-300 hover:bg-slate-800"
                 >
                   Decode
                 </Button>
               </div>
               <Markdown>{parameter.description}</Markdown>
-              <div className='absolute flex flex-col top-0 right-0 m-2 gap-y-2'>
+              <div className="absolute right-0 top-0 m-2 flex flex-col gap-y-2">
                 <Button
-                  onClick={() => removeParameter(parameter.originalParameterName)}
-                  className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
+                  onClick={() =>
+                    removeParameter(parameter.originalParameterName)
+                  }
+                  className="bg-slate-950 text-xs transition duration-300 hover:bg-slate-800"
                 >
-                  <Trash className='h-4 w-4' />
+                  <Trash className="h-4 w-4" />
                 </Button>
                 <Button
                   onClick={() => updateDrawerContent(parameter)}
-                  className="text-xs bg-slate-950 transition duration-300 hover:bg-slate-800"
+                  className="bg-slate-950 text-xs transition duration-300 hover:bg-slate-800"
                 >
-                  <Search className='h-4 w-4'/>
+                  <Search className="h-4 w-4" />
                 </Button>
               </div>
             </div>
           ))}
         </>
       )}
-      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} shouldScaleBackground={false}>
-        <DrawerContent className="bg-slate-800 border-slate-800 p-2 m-20">
+      <Drawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        shouldScaleBackground={false}
+      >
+        <DrawerContent className="m-20 flex flex-col border-slate-800 bg-slate-800 p-2">
           <DrawerHeader>
-            <DrawerTitle>Parameter name: {drawerContent?.name}</DrawerTitle>
-            <DrawerDescription>
-            </DrawerDescription>
+            <DrawerTitle className="text-gray-300">
+              Parameter name: {drawerContent?.name}
+            </DrawerTitle>
+            <DrawerDescription></DrawerDescription>
           </DrawerHeader>
-          <Markdown className="text-gray-300 ml-4 mt-2 mb-8">{drawerContent?.description}</Markdown>
-          <div className='ml-4'>
+          <Markdown className="mb-8 ml-4 mt-2 text-gray-300">
+            {drawerContent?.description}
+          </Markdown>
+          <div className="ml-4 text-gray-300">
             {drawerContent && (
               <>
                 <div className="mb-2">
@@ -176,8 +202,11 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({ parsedQueryString, 
             )}
           </div>
           <DrawerFooter>
-            <Button className='absolute top-0 right-0 p-2 m-2' onClick={() => setDrawerOpen(false)}>
-              Close
+            <Button
+              className="absolute right-0 top-0 m-2 bg-slate-900 p-2 hover:bg-slate-700"
+              onClick={() => setDrawerOpen(false)}
+            >
+              <X />
             </Button>
           </DrawerFooter>
         </DrawerContent>
