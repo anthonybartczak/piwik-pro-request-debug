@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import parseQueryString from "./utils/parseQueryString";
+import parseJsonBody from "./utils/parseJsonBody";
+import hasJsonStructure from "./utils/hasJsonStructure";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import ParameterDisplay from "./components/ParameterDisplay";
 import { Badge } from "./components/ui/badge";
@@ -57,7 +59,10 @@ const App: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const parsedQueryString = parseQueryString(input);
+
+    const parsedQueryString = !hasJsonStructure(input)
+      ? parseQueryString(input)
+      : parseJsonBody(JSON.parse(input));
 
     const convertedParams = parsedQueryString.map((param) => ({
       name: param.name,
