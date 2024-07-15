@@ -18,11 +18,8 @@ import {
   Linkedin,
   CircleUser,
 } from "lucide-react";
-
-type ParsedQueryString = {
-  name: string;
-  value: string;
-};
+import { ParsedQueryString } from "./lib/models";
+import { getEventType } from "./lib/getEventType";
 
 const App: React.FC = () => {
   const defaultString =
@@ -32,7 +29,7 @@ const App: React.FC = () => {
 
   const [savedQueryString, setSavedQueryString] = useLocalStorage(
     "queryString",
-    "",
+    ""
   );
   const [settings, setSettings] = useLocalStorage("settings", {
     useSavedString: true,
@@ -189,7 +186,7 @@ const App: React.FC = () => {
               className="bg-slate-950 p-5 hover:bg-slate-800"
               onClick={() => {
                 const element = document.getElementById(
-                  "modified-query-string-output",
+                  "modified-query-string-output"
                 ) as HTMLInputElement;
                 if (element) {
                   navigator.clipboard.writeText(element.value);
@@ -207,8 +204,16 @@ const App: React.FC = () => {
               .map((param) => `${param.name}=${param.value}`)
               .join("&")}
           ></textarea>
+
+          <div className="text-2xl">
+            Event Type:{" "}
+            <span className="font-bold text-green-600">
+              {getEventType(parsedQueryString)}
+            </span>
+          </div>
         </div>
       )}
+
       <div className="flex flex-col gap-y-2">
         <ParameterDisplay
           useSavedString={settings.useSavedString}
