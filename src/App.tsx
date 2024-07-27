@@ -18,7 +18,7 @@ import {
   Linkedin,
   CircleUser,
 } from "lucide-react";
-import { ParsedQueryString } from "./lib/models";
+import type { ParsedQueryString } from "./lib/models";
 import { getEventType } from "./lib/getEventType";
 
 const App: React.FC = () => {

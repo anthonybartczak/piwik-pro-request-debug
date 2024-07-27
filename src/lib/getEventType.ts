@@ -32,7 +32,7 @@ type EventType =
  * https://help.piwik.pro/support/questions/what-are-events-and-how-are-they-detected/
  */
 export function getEventType(eventParams: ParsedQueryString[]): EventType {
-  if (isGoal(eventParams)) return "Goal Conversion";
+  if (isGoalConversion(eventParams)) return "Goal Conversion";
 
   if (isPing(eventParams)) return getPingType(eventParams);
 
@@ -69,9 +69,9 @@ export function getEventType(eventParams: ParsedQueryString[]): EventType {
   return "Page view";
 }
 
-function isGoal(eventParams: ParsedQueryString[]) {
-  const param = eventParams.find((p) => p.name === "idgoal");
-  return param && param.value !== "0";
+function isGoalConversion(eventParams: ParsedQueryString[]) {
+  const idgoal = eventParams.find((p) => p.name === "idgoal");
+  return idgoal?.value !== "0";
 }
 
 function isPing(eventParams: ParsedQueryString[]) {
@@ -103,23 +103,24 @@ function isOutlink(eventParams: ParsedQueryString[]) {
 }
 
 function isConsentFormImpression(eventParams: ParsedQueryString[]) {
-  const param = eventParams.find((p) => p.name === "e_c");
-  return param?.value === "consent_form_impression";
+  const category = eventParams.find((p) => p.name === "e_c");
+  return category?.value === "consent_form_impression";
 }
 
 function isConsentFormClick(eventParams: ParsedQueryString[]) {
-  const param = eventParams.find((p) => p.name === "e_c");
-  return param?.value === "consent_form_click";
+  const category = eventParams.find((p) => p.name === "e_c");
+  return category?.value === "consent_form_click";
 }
 
 function isConsentDecision(eventParams: ParsedQueryString[]) {
-  const param = eventParams.find((p) => p.name === "e_c");
-  return param?.value === "consent_decision";
+  const category = eventParams.find((p) => p.name === "e_c");
+  return category?.value === "consent_decision";
 }
 
 function isSharePoint(eventParams: ParsedQueryString[]) {
   const eventCustomVariables = eventParams.find((p) => p.name === "cvar");
   const sessionCustomVariables = eventParams.find((p) => p.name === "_cvar");
+  const category = eventParams.find((p) => p.name === "e_c");
 
   const parsedEventCustomVariables =
     eventCustomVariables &&
@@ -129,8 +130,9 @@ function isSharePoint(eventParams: ParsedQueryString[]) {
     JSON.parse(decodeURIComponent(sessionCustomVariables.value));
 
   return (
-    parsedEventCustomVariables?.["1"]?.[0] === "ppas.sharepoint.plugin" ||
-    parsedSessionCustomVariables?.["1"]?.[0] === "ppas.sharepoint.plugin"
+    (parsedEventCustomVariables?.["1"]?.[0] === "ppas.sharepoint.plugin" ||
+      parsedSessionCustomVariables?.["1"]?.[0] === "ppas.sharepoint.plugin") &&
+    (category?.value === "download" || category?.value === "search")
   );
 }
 
@@ -153,9 +155,12 @@ function isContentImpression(eventParams: ParsedQueryString[]) {
 function isCartUpdate(eventParams: ParsedQueryString[]) {
   const idGoal = eventParams.find((p) => p.name === "idgoal");
   const ecIdPresent = eventParams.some((p) => p.name === "ec_id");
-  const eventType = eventParams.find((p) => p.name === "cart-update");
+  const eventType = eventParams.find((p) => p.name === "e_t");
 
-  return (idGoal?.value === "0" && !ecIdPresent) || eventType;
+  return (
+    (idGoal?.value === "0" && !ecIdPresent) ||
+    eventType?.value === "cart-update"
+  );
 }
 
 function isProductDetailView(eventParams: ParsedQueryString[]) {
