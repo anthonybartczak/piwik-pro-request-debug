@@ -29,7 +29,7 @@ const App: React.FC = () => {
 
   const [savedQueryString, setSavedQueryString] = useLocalStorage(
     "queryString",
-    ""
+    "",
   );
   const [settings, setSettings] = useLocalStorage("settings", {
     useSavedString: true,
@@ -180,32 +180,33 @@ const App: React.FC = () => {
       </div>
       {parsedQueryString.length > 0 && (
         <div id="modified-query-string" className="flex flex-col gap-y-2">
-          <div className="flex w-fit flex-row items-center gap-x-2 rounded-sm border border-slate-700/[.65] bg-slate-900 py-1 pl-4 pr-2">
-            <h1 className="text-sm text-gray-300">Query string output</h1>
+          <div className="flex gap-x-2">
+            <textarea
+              id="modified-query-string-output"
+              className="min-h-fit w-full min-w-max resize-none rounded-sm border border-slate-700/[.65] p-3 font-mono shadow-md scrollbar-thin hover:resize-y"
+              readOnly
+              value={parsedQueryString
+                .map((param) => `${param.name}=${param.value}`)
+                .join("&")}
+            ></textarea>
             <Button
-              className="bg-slate-950 p-5 hover:bg-slate-800"
+              className="min-h-fit bg-slate-950 p-5 hover:bg-slate-800"
               onClick={() => {
                 const element = document.getElementById(
-                  "modified-query-string-output"
+                  "modified-query-string-output",
                 ) as HTMLInputElement;
                 if (element) {
                   navigator.clipboard.writeText(element.value);
                 }
               }}
             >
-              <Copy className="h-4 w-4" />
+              <Copy className="h-auto w-auto" />
             </Button>
           </div>
-          <textarea
-            id="modified-query-string-output"
-            className="min-h-fit w-full min-w-max resize-none rounded-sm border border-slate-700/[.65] p-3 font-mono shadow-md scrollbar-thin hover:resize-y"
-            readOnly
-            value={parsedQueryString
-              .map((param) => `${param.name}=${param.value}`)
-              .join("&")}
-          ></textarea>
-
-          <div className="text-2xl">
+          <div
+            id="event-type-detected"
+            className="min-h-fit w-full min-w-max rounded-sm border border-slate-700/[.65] bg-slate-900 p-3 font-mono text-2xl shadow-md"
+          >
             Event Type:{" "}
             <span className="font-bold text-green-600">
               {getEventType(parsedQueryString)}

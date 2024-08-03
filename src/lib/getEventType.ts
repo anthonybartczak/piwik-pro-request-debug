@@ -71,7 +71,7 @@ export function getEventType(eventParams: ParsedQueryString[]): EventType {
 
 function isGoalConversion(eventParams: ParsedQueryString[]) {
   const idgoal = eventParams.find((p) => p.name === "idgoal");
-  return idgoal?.value !== "0";
+  return idgoal?.value && idgoal.value !== "0";
 }
 
 function isPing(eventParams: ParsedQueryString[]) {
