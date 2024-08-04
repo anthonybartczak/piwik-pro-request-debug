@@ -122,12 +122,30 @@ function isSharePoint(eventParams: ParsedQueryString[]) {
   const sessionCustomVariables = eventParams.find((p) => p.name === "_cvar");
   const category = eventParams.find((p) => p.name === "e_c");
 
-  const parsedEventCustomVariables =
-    eventCustomVariables &&
-    JSON.parse(decodeURIComponent(eventCustomVariables.value));
-  const parsedSessionCustomVariables =
-    sessionCustomVariables &&
-    JSON.parse(decodeURIComponent(sessionCustomVariables.value));
+  let parsedEventCustomVariables;
+  let parsedSessionCustomVariables;
+
+  try {
+    if (eventCustomVariables) {
+      parsedEventCustomVariables = JSON.parse(
+        decodeURIComponent(eventCustomVariables.value),
+      );
+    }
+  } catch (e) {
+    console.error("Error parsing event custom variables:", e);
+    return false;
+  }
+
+  try {
+    if (sessionCustomVariables) {
+      parsedSessionCustomVariables = JSON.parse(
+        decodeURIComponent(sessionCustomVariables.value),
+      );
+    }
+  } catch (e) {
+    console.error("Error parsing session custom variables:", e);
+    return false;
+  }
 
   return (
     (parsedEventCustomVariables?.["1"]?.[0] === "ppas.sharepoint.plugin" ||
