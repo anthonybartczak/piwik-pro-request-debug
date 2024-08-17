@@ -140,11 +140,19 @@ const ParameterDisplay: React.FC<ParameterDisplayProps> = ({
               </div>
               <div className="flex flex-row gap-2">
                 <strong>Example:</strong>
-                <code>{truncateString(parameter.example.toString(), 96)}</code>
+                <code>
+                  {parameter.example
+                    ? truncateString(parameter.example.toString(), 96)
+                    : "EMPTY"}
+                </code>
               </div>
               <div className="flex flex-row gap-2">
                 <strong>Current value:</strong>
-                <code>{truncateString(parameter.apiValue.toString(), 96)}</code>
+                <code>
+                  {parameter.apiValue
+                    ? truncateString(parameter.apiValue.toString(), 96)
+                    : "EMPTY"}
+                </code>
                 <Button
                   onClick={() => {
                     const decodedValue = decodeURIComponent(parameter.apiValue);

@@ -9,6 +9,8 @@ import { Button } from "./components/ui/button";
 import { Separator } from "./components/ui/separator";
 import { Switch } from "./components/ui/switch";
 import { useLocalStorage } from "usehooks-ts";
+import type { ParsedQueryString } from "./lib/models";
+import { getEventType } from "./lib/getEventType";
 
 import {
   Accordion,
@@ -26,16 +28,18 @@ import {
   CircleUser,
 } from "lucide-react";
 
-type ParsedQueryString = {
-  name: string;
-  value: string;
-};
-
 const App: React.FC = () => {
-  const defaultString =
-    import.meta.env.VITE_IS_DEV === "true"
-      ? import.meta.env.VITE_DUMMY_QUERY_STRING
-      : "";
+  let defaultString = "";
+  const urlParams = new URLSearchParams(window.location.search);
+  const share = urlParams.get("share");
+
+  if (import.meta.env.VITE_IS_DEV === "true") {
+    defaultString = import.meta.env.VITE_DUMMY_QUERY_STRING;
+  }
+
+  if (share) {
+    defaultString = window.atob(share);
+  }
 
   const [savedQueryString, setSavedQueryString] = useLocalStorage(
     "queryString",
@@ -67,6 +71,9 @@ const App: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+
     const parsedQueryString = !hasJsonStructure(input)
       ? parseQueryString(input)
       : parseJsonBody(JSON.parse(input));
@@ -75,6 +82,15 @@ const App: React.FC = () => {
       name: param.name,
       value: param.value,
     }));
+
+    // Remove the "share" query parameter after submitting the form
+    // We no longer need the share URL since we either save the request or drop it
+    if (params.has("share")) {
+      params.delete("share");
+      const newUrl = `${url.pathname}?${params.toString()}`;
+      console.log(newUrl);
+      window.history.replaceState({}, "", newUrl);
+    }
 
     setParsedQueryString(convertedParams);
   };
@@ -137,7 +153,7 @@ const App: React.FC = () => {
             <Separator decorative className="bg-gray-800" />
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="item-1" className="">
-                <AccordionTrigger className="bg-slate-900 pb-3 pt-1 text-lg">
+                <AccordionTrigger className="bg-slate-900 pb-3 pt-1 text-lg font-thin">
                   Using your browser's developer tools
                 </AccordionTrigger>
                 <AccordionContent className="text-base">
@@ -184,7 +200,7 @@ const App: React.FC = () => {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="item-2">
-                <AccordionTrigger className="bg-slate-900 pb-3 pt-1 text-lg">
+                <AccordionTrigger className="bg-slate-900 pb-3 pt-1 text-lg font-thin">
                   Using Piwik PRO Tracker Debugger
                 </AccordionTrigger>
                 <AccordionContent className="text-base">
@@ -263,10 +279,25 @@ const App: React.FC = () => {
         />
         <button
           type="submit"
-          className="rounded-sm border border-slate-700/[.65] bg-gray-900 px-12 text-white shadow-md transition duration-300 hover:bg-slate-600"
+          className="w-1/6 rounded-sm border border-slate-700/[.65] bg-gray-900 px-12 font-mono uppercase text-white shadow-md transition duration-300 hover:bg-slate-600"
         >
           Submit
         </button>
+        {parsedQueryString.length > 0 && (
+          <button
+            className="w-1/6 rounded-sm border border-slate-700/[.65] bg-gray-900 px-12 font-mono uppercase text-white shadow-md transition duration-300 hover:bg-slate-600"
+            onClick={() => {
+              const url = window.location.href.split("?")[0];
+              const stringToCopy = parsedQueryString
+                .map((param) => `${param.name}=${param.value}`)
+                .join("&");
+              const encoded = btoa(stringToCopy);
+              navigator.clipboard.writeText(`${url}?share=${encoded}`);
+            }}
+          >
+            Share
+          </button>
+        )}
       </form>
       <div
         id="badges-container"
@@ -289,30 +320,66 @@ const App: React.FC = () => {
       </div>
       {parsedQueryString.length > 0 && (
         <div id="modified-query-string" className="flex flex-col gap-y-2">
-          <div className="flex w-fit flex-row items-center gap-x-2 rounded-sm border border-slate-700/[.65] bg-slate-900 py-1 pl-4 pr-2">
-            <h1 className="text-sm text-gray-300">Query string output</h1>
-            <Button
-              className="bg-slate-950 p-5 hover:bg-slate-800"
-              onClick={() => {
-                const element = document.getElementById(
-                  "modified-query-string-output",
-                ) as HTMLInputElement;
-                if (element) {
-                  navigator.clipboard.writeText(element.value);
-                }
-              }}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
+          <div className="flex flex-col gap-y-2 rounded-sm border border-slate-700/[.65] bg-slate-900 p-2 shadow-md">
+            <span className="ml-0.5 font-mono text-sm text-gray-600">
+              Query string output
+            </span>
+            <Separator decorative className="bg-gray-800" />
+
+            <div className="flex gap-x-2">
+              <textarea
+                id="modified-query-string-output"
+                className="min-h-fit w-full min-w-max resize-none rounded-sm border p-3 shadow-md scrollbar-thin scrollbar-none"
+                readOnly
+                value={parsedQueryString
+                  .map((param) => `${param.name}=${param.value}`)
+                  .join("&")}
+              ></textarea>
+              <Button
+                className="h-max min-w-fit rounded-md bg-slate-950 p-6 hover:bg-slate-800"
+                onClick={() => {
+                  const element = document.getElementById(
+                    "modified-query-string-output",
+                  ) as HTMLInputElement;
+                  if (element) {
+                    navigator.clipboard.writeText(element.value);
+                  }
+                }}
+              >
+                <Copy className="h-auto w-auto" />
+              </Button>
+            </div>
           </div>
-          <textarea
-            id="modified-query-string-output"
-            className="min-h-fit w-full min-w-max resize-none rounded-sm border border-slate-700/[.65] p-3 font-mono shadow-md scrollbar-thin hover:resize-y"
-            readOnly
-            value={parsedQueryString
-              .map((param) => `${param.name}=${param.value}`)
-              .join("&")}
-          ></textarea>
+
+          <div
+            id="event-details-display"
+            className="flex flex-col gap-x-2 gap-y-1.5 rounded-sm border border-slate-700/[.65] bg-slate-900 p-2 shadow-md"
+          >
+            <span className="ml-0.5 font-mono text-sm text-gray-600">
+              Event details
+            </span>
+            <Separator decorative className="bg-gray-800" />
+            <div>
+              <div
+                id="event-type-detected"
+                className="min-h-fit w-fit rounded-sm bg-slate-950 p-2 font-mono text-xl shadow-sm"
+              >
+                Event type:{" "}
+                <span className="rounded-sm bg-gray-900 p-1.5 uppercase shadow-xl">
+                  {getEventType(parsedQueryString)}
+                </span>
+              </div>
+              {/* <div
+              id="event-type-detected"
+              className="min-h-fit w-fit rounded-sm border border-slate-700/[.65] bg-slate-900 p-3 font-mono text-xl shadow-md"
+            >
+              Event Type:{" "}
+              <span className="rounded-md bg-gray-800 p-1.5 uppercase shadow-xl">
+                {getEventType(parsedQueryString)}
+              </span>
+            </div> */}
+            </div>
+          </div>
         </div>
       )}
       <div className="flex flex-col gap-y-2">
