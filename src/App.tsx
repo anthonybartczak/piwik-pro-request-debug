@@ -26,6 +26,7 @@ import {
   Settings2,
   Linkedin,
   CircleUser,
+  BookHeart,
 } from "lucide-react";
 
 const App: React.FC = () => {
@@ -130,14 +131,26 @@ const App: React.FC = () => {
               <ul className="flex flex-col gap-y-2">
                 <li className="flex gap-x-2">
                   <Github className="h-5 w-5" />
-                  <a href="https://github.com/anthonybartczak/piwik-pro-request-debug">
+                  <a
+                    target="_blank"
+                    href="https://github.com/anthonybartczak/piwik-pro-request-debug"
+                  >
                     Github
                   </a>
                 </li>
                 <li className="flex gap-x-2">
                   <Linkedin className="h-5 w-5" />
-                  <a href="https://www.linkedin.com/in/antoni-bartczak-525187183/">
+                  <a
+                    target="_blank"
+                    href="https://www.linkedin.com/in/antoni-bartczak-525187183/"
+                  >
                     LinkedIn
+                  </a>
+                </li>
+                <li className="flex gap-x-2">
+                  <BookHeart className="h-5 w-5" />
+                  <a target="_blank" href="https://anteriam.pl">
+                    Website
                   </a>
                 </li>
               </ul>
