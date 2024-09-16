@@ -3,6 +3,13 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import PiwikPro from "@piwikpro/react-piwik-pro";
+import TagManager from "react-gtm-module";
+
+const tagManagerArgs = {
+  gtmId: "GTM-MKHGC28F",
+};
+
+TagManager.initialize(tagManagerArgs);
 
 PiwikPro.initialize(
   "01eb8b1c-0f3f-4416-ae37-a9562f6fabb8",
