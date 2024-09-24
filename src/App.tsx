@@ -149,7 +149,7 @@ const App: React.FC = () => {
                 </li>
                 <li className="flex gap-x-2">
                   <BookHeart className="h-5 w-5" />
-                  <a target="_blank" href="https://anteriam.pl">
+                  <a href="https://anteriam.pl">
                     Website
                   </a>
                 </li>
