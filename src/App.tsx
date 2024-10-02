@@ -69,6 +69,15 @@ const App: React.FC = () => {
     setSettings({ ...settings, useSavedString: value });
   };
 
+  
+  const generateDlEvent = () => {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "login",
+      login_domain: "requests.anteriam.com"
+    });
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -149,7 +158,9 @@ const App: React.FC = () => {
                 </li>
                 <li className="flex gap-x-2">
                   <BookHeart className="h-5 w-5" />
-                  <a href="https://anteriam.pl">
+                  <a
+                    onClick={() => generateDlEvent()}
+                    href="https://anteriam.pl">
                     Website
                   </a>
                 </li>
